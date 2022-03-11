@@ -97,13 +97,28 @@ for first_date in date_iter:
 		pdf.cell(w=indent_padding, align="C", txt=date.strftime("%a"))
 
 	# insert month overview in bottom right corner
-	cw = row_spacing*6
-	ch = cw
-	pdf.set_xy(pdf.w-horizontal_padding-cw, pdf.h-vertical_padding - ch)
+	cw = row_spacing * 6  # calendar width
+	ch = cw  # calendar height
+	crh = ch / 7  # calendar row height
+	cch = cw / 7 # calendar column height
+	cx = pdf.w-horizontal_padding-cw # calendar x
+	cy = pdf.h-vertical_padding - ch # calendar y
+	pdf.set_xy(cx, cy)
 	pdf.set_fill_color(215)
 	pdf.cell(cw, ch, txt="", fill=True)
 	pdf.set_margin(0)
-	pdf.set_xy(pdf.w-horizontal_padding-cw, pdf.h-vertical_padding -ch)
+	pdf.set_xy(cx, cy)
 	pdf.set_font('helvetica', "", 10)
 	pdf.cell(w=cw, txt=first_date.strftime("%B"), align="C")
+	pdf.set_xy(cx, cy + crh)
+	weekdays = ["M", "T",  "W",  "T", "F", "S", "S"]
+	for c in range(7):
+		pdf.set_xy(cx + cch*c,cy+crh)
+		pdf.cell(txt=weekdays[c])
+
+	for c in range(7):
+		for r in range(5):
+			pdf.set_xy(cx+cch*c, cy + crh*(r+2))
+			pdf.cell(txt=str(r*7 + c))
+
 pdf.output(str(YEAR) + "planner.pdf")
