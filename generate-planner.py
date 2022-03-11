@@ -108,10 +108,11 @@ for first_date in date_iter:
 		pdf.cell(w=indent_padding, align="C", txt=date.strftime("%a"))
 
 	# insert month overview in bottom right corner
-	cw = row_spacing * 7  # calendar width
+	cw = row_spacing * 6  # calendar width
 	ch = row_spacing * 5  # calendar height
-	crh, cch = ch / 7, cw / 7  # calendar row height and column width
+	crh, ccw = ch / 7, cw / 7  # calendar row height and column width
 	cx, cy = pdf.w-horizontal_padding-cw, pdf.h-vertical_padding - ch  # calendar x and y
+	pdf.set_font('helvetica', "", 11)
 
 	# index in dates list of the first day in current month
 	index_start_calendar = dates.index(first_date) - first_date.day + 1
@@ -121,13 +122,11 @@ for first_date in date_iter:
 
 	# set grey background
 	pdf.set_xy(cx, cy)
-	pdf.set_fill_color(215)
+	pdf.set_fill_color(235)
 	pdf.cell(cw, ch, txt="", fill=True)
 
 	# Add month header
 	pdf.set_xy(cx, cy)
-	pdf.set_font('helvetica', "", 10)
-
 	# Pick month based off of index_start_calendar + 2 in case month changes early week
 	pdf.cell(w=cw, txt=dates[index_start_calendar + 2].strftime("%B"), align="C")
 
@@ -135,19 +134,24 @@ for first_date in date_iter:
 	pdf.set_xy(cx, cy + crh)
 	weekdays = ["M", "T",  "W",  "T", "F", "S", "S"]
 	for c in range(7):
-		pdf.set_xy(cx + cch*c, cy+crh)
+		pdf.set_xy(cx + ccw*c, cy+crh)
 		pdf.cell(txt=weekdays[c])
 
 	# Add dates and links to page
 	for r in range(5):
 		for c in range(7):
-			pdf.set_xy(cx+cch*c, cy + crh*(r+2))
+			pdf.set_xy(cx+ccw*c, cy + crh*(r+2))
 			link = pdf.add_link()
 			page = int((index_start_calendar / 7) + 2)
 			if page < 2:
 				page = 2
 			pdf.set_link(link, page=page)
 			pdf.cell(txt=str(dates[index_start_calendar].day), link=link)
+			# Add a border around this week
+			if dates[index_start_calendar] == first_date:
+				pdf.set_xy(cx + ccw * c + ccw/10, cy + crh * (r + 2))
+				pdf.cell(w=cw-ccw/5, h=crh, border=True)
+
 			index_start_calendar += 1
 
 pdf.output(str(YEAR) + "planner.pdf")
