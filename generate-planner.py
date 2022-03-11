@@ -14,6 +14,7 @@ day_horizontal_spacing = horizontal_padding
 day_width = (pdf.w - horizontal_padding*2 - day_horizontal_spacing) / 2
 rows_per_day = 7
 row_spacing = day_height / (rows_per_day + 1)
+DAYS_OF_WEEK =["MON", "TUES", "WED", "THURS", "FRI", "SAT", "SUN"]
 
 # Each month has enough days to fill out every week, when the month ends midweek this means the week is in the ending
 # month and starting month
@@ -67,41 +68,30 @@ for first_date in date_iter:
     pdf.set_font('helvetica', 'B', 25)
     pdf.set_xy(horizontal_padding, vertical_padding+day_height+2)
     pdf.cell(w=indent_padding, align="C", txt=str(first_date.day))
-
-    for i in range(2,4):
-        pdf.set_xy(horizontal_padding, vertical_padding+day_height*i+2)
-        pdf.cell(w=indent_padding, align="C", txt=str(next(date_iter).day))
-    '''
-    pdf.set_xy(horizontal_padding, vertical_padding+day_height*3+2)
-    pdf.cell(w=indent_padding, align="C", txt=str(next(date_iter).day))
-'''
-    for i in range(4):
-        pdf.set_xy(horizontal_padding+day_width + day_horizontal_spacing, vertical_padding+day_height*i+2)
-        pdf.cell(w=indent_padding, align="C", txt=str(next(date_iter).day))
-    '''
-    pdf.set_xy(horizontal_padding+day_width + day_horizontal_spacing, vertical_padding+day_height*1+2)
-    pdf.cell(w=indent_padding, align="C", txt=str(next(date_iter).day))
-    pdf.set_xy(horizontal_padding+day_width + day_horizontal_spacing, vertical_padding+day_height*2+2)
-    pdf.cell(w=indent_padding, align="C", txt=str(next(date_iter).day))
-    pdf.set_xy(horizontal_padding+day_width + day_horizontal_spacing, vertical_padding+day_height*3+2)
-    pdf.cell(w=indent_padding, align="C", txt=str(next(date_iter).day))
-    '''
-    pdf.set_font('helvetica',"", 15)
+    pdf.set_font('helvetica', "", 15)
     pdf.set_xy(horizontal_padding, vertical_padding+day_height + 11)
     pdf.cell(w=indent_padding, align="C",txt="Mon")
-    pdf.set_xy(horizontal_padding, vertical_padding+day_height*2 + 11)
-    pdf.cell(w=indent_padding, align="C",txt="Tues")
-    pdf.set_xy(horizontal_padding, vertical_padding+day_height*3 + 11)
-    pdf.cell(w=indent_padding, align="C",txt="Wed")
 
-    pdf.set_xy(horizontal_padding+day_width + day_horizontal_spacing, vertical_padding + 11)
-    pdf.cell(w=indent_padding, align="C",txt="Thurs")
-    pdf.set_xy(horizontal_padding+day_width + day_horizontal_spacing, vertical_padding+day_height*1 + 11)
-    pdf.cell(w=indent_padding, align="C",txt="Fri")
-    pdf.set_xy(horizontal_padding+day_width + day_horizontal_spacing, vertical_padding+day_height*2 + 11)
-    pdf.cell(w=indent_padding, align="C",txt="Sat")
-    pdf.set_xy(horizontal_padding+day_width + day_horizontal_spacing, vertical_padding+day_height*3 + 11)
-    pdf.cell(w=indent_padding, align="C",txt="Sun")
+    for i in range(2,4):
+        date = next(date_iter)
+
+        pdf.set_font('helvetica', 'B', 25)
+        pdf.set_xy(horizontal_padding, vertical_padding+day_height*i+2)
+        pdf.cell(w=indent_padding, align="C", txt=str(date.day))
+
+        pdf.set_font('helvetica', "", 15)
+        pdf.set_xy(horizontal_padding, vertical_padding + day_height*i + 11)
+        pdf.cell(w=indent_padding, align="C", txt=DAYS_OF_WEEK[date.weekday()])
+    for i in range(4):
+        date = next(date_iter)
+
+        pdf.set_font('helvetica', 'B', 25)
+        pdf.set_xy(horizontal_padding+day_width + day_horizontal_spacing, vertical_padding+day_height*i+2)
+        pdf.cell(w=indent_padding, align="C", txt=str(date.day))
+
+        pdf.set_font('helvetica', "", 15)
+        pdf.set_xy(horizontal_padding + day_width + day_horizontal_spacing, vertical_padding + day_height * i + 11)
+        pdf.cell(w=indent_padding, align="C", txt=DAYS_OF_WEEK[date.weekday()])
 
 pdf.output(str(YEAR) + "planner.pdf")
 
