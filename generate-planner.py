@@ -2,7 +2,6 @@ from fpdf import FPDF
 import calendar
 
 # https://pyfpdf.github.io/fpdf2/
-# TODO might be able to use margin in FPDF instead of creating it
 
 pdf = FPDF(orientation="l")
 YEAR = 2022
@@ -14,7 +13,6 @@ day_horizontal_spacing = horizontal_padding
 day_width = (pdf.w - horizontal_padding * 2 - day_horizontal_spacing) / 2
 rows_per_day = 7
 row_spacing = day_height / (rows_per_day + 1)
-DAYS_OF_WEEK = ["Mon", "Tues", "Wed", "Thurs", "Fri", "Sat", "Sun"]
 
 # Each month has enough days to fill out every week, when the month ends midweek this means the week is in the ending
 # month and starting month
@@ -74,7 +72,7 @@ for first_date in date_iter:
 
 	pdf.set_font('helvetica', "", 15)
 	pdf.set_xy(horizontal_padding, vertical_padding + day_height + 11)
-	pdf.cell(w=indent_padding, align="C", txt=DAYS_OF_WEEK[first_date.weekday()])
+	pdf.cell(w=indent_padding, align="C", txt=first_date.strftime("%a"))
 
 	for i in range(2, 4):
 		date = next(date_iter)
@@ -85,7 +83,7 @@ for first_date in date_iter:
 
 		pdf.set_font('helvetica', "", 15)
 		pdf.set_xy(horizontal_padding, vertical_padding + day_height * i + 11)
-		pdf.cell(w=indent_padding, align="C", txt=DAYS_OF_WEEK[date.weekday()])
+		pdf.cell(w=indent_padding, align="C", txt=date.strftime("%a"))
 
 	for i in range(4):
 		date = next(date_iter)
@@ -96,6 +94,16 @@ for first_date in date_iter:
 
 		pdf.set_font('helvetica', "", 15)
 		pdf.set_xy(horizontal_padding + day_width + day_horizontal_spacing, vertical_padding + day_height * i + 11)
-		pdf.cell(w=indent_padding, align="C", txt=DAYS_OF_WEEK[date.weekday()])
+		pdf.cell(w=indent_padding, align="C", txt=date.strftime("%a"))
 
+	# insert month overview in bottom right corner
+	cw = row_spacing*6
+	ch = cw
+	pdf.set_xy(pdf.w-horizontal_padding-cw, pdf.h-vertical_padding - ch)
+	pdf.set_fill_color(215)
+	pdf.cell(cw, ch, txt="", fill=True)
+	pdf.set_margin(0)
+	pdf.set_xy(pdf.w-horizontal_padding-cw, pdf.h-vertical_padding -ch)
+	pdf.set_font('helvetica', "", 10)
+	pdf.cell(w=cw, txt=first_date.strftime("%B"), align="C")
 pdf.output(str(YEAR) + "planner.pdf")
