@@ -39,13 +39,13 @@ links = dict()
 # There is probably a better way to get all the dates for a given year
 dates_with_dup = [i for m in range(1, 13) for i in calendar.Calendar(firstweekday=0).itermonthdates(YEAR, m)]
 dates = []
-page = 0
+current_page = 0
 for date in dates_with_dup:
 	if date not in dates:
 		dates.append(date)
 
 pdf.add_page()
-page += 1
+current_page += 1
 pdf.set_font('helvetica', 'B', 30)
 pdf.set_y(pdf.h/2)
 pdf.cell(txt=str(YEAR) + " PLANNER", center=True, ln=2)
@@ -56,9 +56,19 @@ date_iter = Iterator(dates)
 
 while date_iter.has_next():
 	pdf.add_page()
-	page += 1
+	current_page += 1
 	page_link = pdf.add_link()
-	pdf.set_link(page_link, page=page)
+	pdf.set_link(page_link, page=current_page)
+
+	first_date_of_week = date_iter.peek()
+
+	# add week title
+	pdf.set_font('helvetica', 'B', 20)
+	pdf.set_xy(0, vertical_padding*2)
+	pdf.cell(w=horizontal_padding+day_horizontal_spacing+day_width, align="C",
+	         txt=first_date_of_week.strftime("Week Beginning %b %d"))
+
+	# Add lines to separate days
 	for y in range(5):
 		if not y == 0:
 			with pdf.new_path() as path:
@@ -73,30 +83,26 @@ while date_iter.has_next():
 			path.line_to(pdf.w - horizontal_padding, vertical_padding + day_height * y)
 			path.close()
 
+	# add lines in each day
 	for y in range(4):
 		for line in range(1, rows_per_day + 1):
 			if not y == 0:
 				with pdf.new_path() as path:
-					path.style.stroke_width = .15
+					path.style.stroke_width = .14
 					path.move_to(horizontal_padding + indent_padding,
 					             vertical_padding + day_height * y + row_spacing * line)
 					path.line_to(horizontal_padding + day_width, vertical_padding + day_height * y + row_spacing * line)
 					path.close()
 
 			with pdf.new_path() as path:
-				path.style.stroke_width = .15
+				path.style.stroke_width = .14
 				path.move_to(horizontal_padding + indent_padding + day_width + day_horizontal_spacing,
 				             vertical_padding + day_height * y + row_spacing * line)
 				path.line_to(horizontal_padding + day_width + day_width + day_horizontal_spacing,
 				             vertical_padding + day_height * y + row_spacing * line)
 				path.close()
 
-	pdf.set_font('helvetica', 'B', 25)
-	pdf.set_xy(0, vertical_padding*2)
-	pdf.cell(w=horizontal_padding+day_horizontal_spacing+day_width, align="C",
-	         txt=date_iter.peek().strftime("Week Beginning %b %d"))
-	first_date = date_iter.peek()
-
+	# Add date on left
 	for i in range(1, 4):
 		date = date_iter.get_next()
 		links[date] = page_link
@@ -108,6 +114,7 @@ while date_iter.has_next():
 		pdf.set_xy(horizontal_padding, vertical_padding + day_height * i + 11)
 		pdf.cell(w=indent_padding, align="C", txt=date.strftime("%a"))
 
+	# Add date labels on right
 	for i in range(4):
 		date = date_iter.get_next()
 		links[date] = page_link
@@ -128,8 +135,8 @@ while date_iter.has_next():
 	pdf.set_font('helvetica', "", 11)
 
 	# index in dates list of the first day in current month
-	index_start_calendar = dates.index(first_date) - first_date.day + 1
 	# get monday
+	index_start_calendar = dates.index(first_date_of_week) - first_date_of_week.day + 1
 	while dates[index_start_calendar].weekday() > 0:
 		index_start_calendar -= 1
 
@@ -139,8 +146,8 @@ while date_iter.has_next():
 	pdf.cell(cw, ch, txt="", fill=True)
 
 	# Add month header
-	pdf.set_xy(cx, cy)
 	# Pick month based off of index_start_calendar + 2 in case month changes early week
+	pdf.set_xy(cx, cy)
 	pdf.cell(w=cw, txt=dates[index_start_calendar + 2].strftime("%B"), align="C")
 
 	# Add weekday headers
@@ -161,7 +168,7 @@ while date_iter.has_next():
 			pdf.set_link(link, page=page)
 			pdf.cell(txt=str(dates[index_start_calendar].day), link=link)
 			# Add a border around this week
-			if dates[index_start_calendar] == first_date:
+			if dates[index_start_calendar] == first_date_of_week:
 				pdf.set_xy(cx + ccw * c + ccw/10, cy + crh * (r + 2))
 				pdf.cell(w=cw-ccw/5, h=crh, border=True)
 
