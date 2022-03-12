@@ -5,12 +5,6 @@ from fpdf import FPDF
 
 # https://pyfpdf.github.io/fpdf2/
 
-'''
-TODO 
-Make monday have more rows than other dates
-End of year december shoes November for mini calendar
-'''
-
 
 class Iterator:
 	def __init__(self, lst):

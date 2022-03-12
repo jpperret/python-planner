@@ -2,6 +2,10 @@
 
 After searching for a PDF weekly planner for my iPad I decided to try and create one with python.
 
+## Bugs / TODO
+- Make monday have more rows than other dates
+- End of year december shoes November for mini calendar
+
 ## Libraries
 ### Considered
 
