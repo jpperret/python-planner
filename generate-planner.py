@@ -5,6 +5,12 @@ from fpdf import FPDF
 
 # https://pyfpdf.github.io/fpdf2/
 
+'''
+TODO 
+Make monday have more rows than other dates
+End of year december shoes November for mini calendar
+'''
+
 
 class Iterator:
 	def __init__(self, lst):
@@ -31,13 +37,13 @@ vertical_padding = 10
 horizontal_padding = 10
 indent_padding = 15  # smaller lines for each date padding
 rows_per_day = 7
-day_horizontal_spacing = horizontal_padding  # horizontal space between days
+day_horizontal_spacing = 10  # horizontal space between days
 
 # Compute more constants
 day_height = (pdf.h - vertical_padding * 2) / 4
 day_width = (pdf.w - horizontal_padding * 2 - day_horizontal_spacing) / 2
 row_spacing = day_height / (rows_per_day + 1)
-links = dict()
+links = dict()  # date to page links
 weekdays = ["M", "T", "W", "T", "F", "S", "S"]
 
 # Get all dates in a year
@@ -67,7 +73,7 @@ while date_iter.has_next():
 
 	# add week title
 	pdf.set_font('helvetica', 'B', 20)
-	pdf.set_xy(0, vertical_padding * 2)
+	pdf.set_xy(0, vertical_padding)
 	pdf.cell(w=horizontal_padding + day_horizontal_spacing + day_width, align="C",
 			 txt=first_date_of_week.strftime("Week Beginning %b %d"))
 
