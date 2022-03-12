@@ -4,6 +4,7 @@ import datetime
 
 # https://pyfpdf.github.io/fpdf2/
 
+
 class Iterator:
 	def __init__(self, lst):
 		self.list = lst
@@ -42,7 +43,6 @@ page = 0
 for date in dates_with_dup:
 	if date not in dates:
 		dates.append(date)
-date_iter = iter(dates)
 
 pdf.add_page()
 page += 1
@@ -52,7 +52,9 @@ pdf.cell(txt=str(YEAR) + " PLANNER", center=True, ln=2)
 pdf.set_font('helvetica', '', 15)
 pdf.cell(txt="https://github.com/jpperret/python-planner", link="https://github.com/jpperret/python-planner", center=True)
 
-for first_date in date_iter:
+date_iter = Iterator(dates)
+
+while date_iter.has_next():
 	pdf.add_page()
 	page += 1
 	page_link = pdf.add_link()
@@ -91,20 +93,12 @@ for first_date in date_iter:
 
 	pdf.set_font('helvetica', 'B', 25)
 	pdf.set_xy(0, vertical_padding*2)
-	pdf.cell(w=horizontal_padding+day_horizontal_spacing+day_width, align="C", txt=first_date.strftime("Week Beginning %b %d"))
+	pdf.cell(w=horizontal_padding+day_horizontal_spacing+day_width, align="C",
+	         txt=date_iter.peek().strftime("Week Beginning %b %d"))
+	first_date = date_iter.peek()
 
-	pdf.set_font('helvetica', 'B', 25)
-	pdf.set_xy(horizontal_padding, vertical_padding + day_height + 2)
-	pdf.cell(w=indent_padding, align="C", txt=str(first_date.day))
-
-	links[first_date] = page_link
-
-	pdf.set_font('helvetica', "", 15)
-	pdf.set_xy(horizontal_padding, vertical_padding + day_height + 11)
-	pdf.cell(w=indent_padding, align="C", txt=first_date.strftime("%a"))
-
-	for i in range(2, 4):
-		date = next(date_iter)
+	for i in range(1, 4):
+		date = date_iter.get_next()
 		links[date] = page_link
 		pdf.set_font('helvetica', 'B', 25)
 		pdf.set_xy(horizontal_padding, vertical_padding + day_height * i + 2)
@@ -115,7 +109,7 @@ for first_date in date_iter:
 		pdf.cell(w=indent_padding, align="C", txt=date.strftime("%a"))
 
 	for i in range(4):
-		date = next(date_iter)
+		date = date_iter.get_next()
 		links[date] = page_link
 
 		pdf.set_font('helvetica', 'B', 25)
