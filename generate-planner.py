@@ -4,6 +4,22 @@ import datetime
 
 # https://pyfpdf.github.io/fpdf2/
 
+class Iterator:
+	def __init__(self, lst):
+		self.list = lst
+		self.index = 0
+
+	def has_next(self):
+		return self.index < len(self.list) - 1
+
+	def peek(self):
+		return self.list[self.index]
+
+	def get_next(self):
+		self.index += 1
+		return self.list[self.index -1]
+
+
 pdf = FPDF(orientation="l")
 pdf.set_margin(0)
 
@@ -32,7 +48,7 @@ pdf.add_page()
 page += 1
 pdf.set_font('helvetica', 'B', 30)
 pdf.set_y(pdf.h/2)
-pdf.cell(txt=str(YEAR) + " PLANNER" , center=True, ln=2)
+pdf.cell(txt=str(YEAR) + " PLANNER", center=True, ln=2)
 pdf.set_font('helvetica', '', 15)
 pdf.cell(txt="https://github.com/jpperret/python-planner", link="https://github.com/jpperret/python-planner", center=True)
 
