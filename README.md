@@ -3,7 +3,7 @@
 After searching for a PDF weekly planner for my iPad I decided to try and create one with python.
 
 ## Libraries
-###Considered
+### Considered
 
 - pyPdf
   - Doesn't seem to have recent documentation http://pybrary.net/pyPdf/pythondoc-pyPdf.pdf.html
