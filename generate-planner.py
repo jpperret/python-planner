@@ -1,6 +1,5 @@
 from fpdf import FPDF
 import calendar
-import datetime
 
 # https://pyfpdf.github.io/fpdf2/
 
@@ -24,41 +23,42 @@ class Iterator:
 pdf = FPDF(orientation="l")
 pdf.set_margin(0)
 
+# Set constants
 YEAR = 2022
 vertical_padding = 10
 horizontal_padding = 10
-indent_padding = 15
-day_height = (pdf.h - vertical_padding * 2) / 4
-day_horizontal_spacing = horizontal_padding
-day_width = (pdf.w - horizontal_padding * 2 - day_horizontal_spacing) / 2
+indent_padding = 15  # smaller lines for each date padding
 rows_per_day = 7
+day_horizontal_spacing = horizontal_padding  # horizontal space between days
+
+# Compute more constants
+day_height = (pdf.h - vertical_padding * 2) / 4
+day_width = (pdf.w - horizontal_padding * 2 - day_horizontal_spacing) / 2
 row_spacing = day_height / (rows_per_day + 1)
 links = dict()
-# Each month has enough days to fill out every week, when the month ends midweek this means the week is in the ending
-# month and starting month
-# There is probably a better way to get all the dates for a given year
+
+# Get all dates in a year
 dates_with_dup = [i for m in range(1, 13) for i in calendar.Calendar(firstweekday=0).itermonthdates(YEAR, m)]
 dates = []
-current_page = 0
 for date in dates_with_dup:
 	if date not in dates:
 		dates.append(date)
+date_iter = Iterator(dates)
 
+# Add title page
 pdf.add_page()
-current_page += 1
 pdf.set_font('helvetica', 'B', 30)
 pdf.set_y(pdf.h/2)
 pdf.cell(txt=str(YEAR) + " PLANNER", center=True, ln=2)
 pdf.set_font('helvetica', '', 15)
 pdf.cell(txt="https://github.com/jpperret/python-planner", link="https://github.com/jpperret/python-planner", center=True)
 
-date_iter = Iterator(dates)
 
 while date_iter.has_next():
 	pdf.add_page()
-	current_page += 1
+
 	page_link = pdf.add_link()
-	pdf.set_link(page_link, page=current_page)
+	pdf.set_link(page_link, page=pdf.page)
 
 	first_date_of_week = date_iter.peek()
 
