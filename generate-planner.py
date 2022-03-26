@@ -44,7 +44,7 @@ day_height = (pdf.h - vertical_padding * 2) / 4
 day_width = (pdf.w - horizontal_padding * 2 - day_horizontal_spacing) / 2
 row_spacing = day_height / (rows_per_day + 1)
 links = dict()  # date to page links
-cw = row_spacing * 6  # mini calendar width
+cw = row_spacing * 6.5  # mini calendar width
 ch = row_spacing * 5  # mini calendar height
 crh, ccw = ch / 8, cw / 7  # mini calendar row height and column width
 cx, cy = pdf.w - horizontal_padding - cw, pdf.h - vertical_padding - ch  # mini calendar x and y
@@ -84,7 +84,7 @@ while date_iter.has_next():
 			 txt=first_date_of_week.strftime("Week Beginning %b %d, %Y"))
 
 	# Add lines to separate days
-	pdf.set_line_width(.3)
+	pdf.set_line_width(.2)
 	for y in range(5):
 		if y == 1:  # monday
 			line_y = vertical_padding + day_height * y - extra_rows_monday * row_spacing
@@ -96,7 +96,7 @@ while date_iter.has_next():
 		pdf.line(horizontal_padding + day_horizontal_spacing + day_width, line_y, pdf.w - horizontal_padding, line_y)
 
 	# add lines in each day
-	pdf.set_line_width(.12)
+	pdf.set_line_width(.04)
 	for y in range(4):
 		for line in range(1, rows_per_day + 1):
 			if y == 1:  # monday
@@ -178,11 +178,11 @@ while date_iter.has_next():
 			pdf.cell(txt=["M", "T", "W", "T", "F", "S", "S"][c])
 
 		# Add dates and links to page
-		for r in range(6):
-			for c in range(7):
+		for r in range(6):  # up to 6 weeks for each month
+			for c in range(7):  # 7 days in a week
 				if index_start_calendar >= len(dates):
 					break
-				pdf.set_xy(cx + ccw * c, cy + crh * (r + 2))
+				pdf.set_xy(cx + ccw * c, cy + crh * (r + 2))  # + 2 to skip month and weekday headers
 				link = pdf.add_link()
 				# divided by 7 for week. Add 2 for rounding down and title page
 				page = int((index_start_calendar / 7) + 2)
@@ -195,7 +195,9 @@ while date_iter.has_next():
 
 				# Add a border around this week
 				if dates[index_start_calendar] == first_date_of_week:
-					pdf.set_xy(cx + ccw * c + ccw / 10, cy + crh * (r + 2))
+					# (ccw / 10) is one half the padding in the rectangle (width = cw - ccw / 5)
+					# (r + 2) to skip month and weekday headers
+					pdf.set_xy(cx + ccw * c + (ccw / 10), cy + crh * (r + 2))
 					pdf.cell(w=cw - ccw / 5, h=crh, border=True)
 
 				index_start_calendar += 1
