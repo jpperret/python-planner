@@ -39,8 +39,8 @@ row_spacing = day_height / (rows_per_day + 1)
 links = dict()  # date to page links
 weekdays = ["M", "T", "W", "T", "F", "S", "S"]
 cw = row_spacing * 7  # calendar width
-ch = row_spacing * 5  # calendar height
-crh, ccw = ch / 7, cw / 7  # calendar row height and column width
+ch = row_spacing * 6  # calendar height
+crh, ccw = ch / 8, cw / 7  # calendar row height and column width
 cx, cy = pdf.w - horizontal_padding - cw, pdf.h - vertical_padding - ch  # calendar x and y
 
 # Get all dates in a year
@@ -132,9 +132,10 @@ while date_iter.has_next():
 		pdf.cell(cw, ch, txt="", fill=True)
 
 		# index in dates list of the first day in current month
+		first_date_of_month = dates[dates.index(first_date_of_week)+3]  # If month changes on thurs then use next month
+		index_start_calendar = dates.index(first_date_of_month) - first_date_of_month.day + 1
+		cal_month = dates[index_start_calendar].month
 		# get monday
-		index_start_calendar = dates.index(first_date_of_week) - first_date_of_week.day + 1
-		cal_month = first_date_of_week.month
 		while dates[index_start_calendar].weekday() != 0:
 			index_start_calendar -= 1
 
@@ -149,7 +150,7 @@ while date_iter.has_next():
 			pdf.cell(txt=weekdays[c])
 
 		# Add dates and links to page
-		for r in range(5):
+		for r in range(6):
 			for c in range(7):
 				if index_start_calendar >= len(dates):
 					break
