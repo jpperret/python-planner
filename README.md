@@ -4,7 +4,8 @@ After searching for a PDF weekly planner for my iPad I decided to try and create
 
 ## Bugs / TODO
 - Make monday have more rows than other dates
-- End of year december shoes November for mini calendar
+- End of year december shows November for mini calendar
+- 
 
 ## Libraries
 ### Considered
