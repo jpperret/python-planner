@@ -79,12 +79,13 @@ while date_iter.has_next():
 
 	# add week title
 	pdf.set_font('helvetica', 'B', 20)
-	pdf.set_xy(0, vertical_padding)
+	pdf.set_xy(0, vertical_padding*1.5)
 	pdf.cell(w=horizontal_padding + day_horizontal_spacing + day_width, align="C",
 			 txt=first_date_of_week.strftime("Week Beginning %b %d, %Y"))
 
 	# Add lines to separate days
-	pdf.set_line_width(.2)
+	pdf.set_line_width(.3)
+	pdf.set_draw_color(0)
 	for y in range(5):
 		if y == 1:  # monday
 			line_y = vertical_padding + day_height * y - extra_rows_monday * row_spacing
@@ -96,15 +97,11 @@ while date_iter.has_next():
 		pdf.line(horizontal_padding + day_horizontal_spacing + day_width, line_y, pdf.w - horizontal_padding, line_y)
 
 	# add lines in each day
-	pdf.set_line_width(.04)
+	pdf.set_draw_color(100)
+	pdf.set_line_width(.1)
 	for y in range(4):
 		for line in range(1, rows_per_day + 1):
-			if y == 1:  # monday
-				for extra_line in range(extra_rows_monday + 1):
-					line_y = vertical_padding + day_height * y + row_spacing * (
-							line + extra_line) - extra_rows_monday * row_spacing
-					pdf.line(horizontal_padding + indent_padding, line_y, horizontal_padding + day_width, line_y)
-			elif not y == 0:  # skip first day on left side
+			if not y == 0:  # skip first day on left side
 				line_y = vertical_padding + day_height * y + row_spacing * line
 				pdf.line(horizontal_padding + indent_padding, line_y, horizontal_padding + day_width, line_y)
 
@@ -112,6 +109,10 @@ while date_iter.has_next():
 			line_y = vertical_padding + day_height * y + row_spacing * line
 			pdf.line(horizontal_padding + indent_padding + day_width + day_horizontal_spacing, line_y,
 					 horizontal_padding + day_width + day_width + day_horizontal_spacing, line_y)
+	# Add extra rows for monday
+	for extra_line in range(extra_rows_monday + 1):
+		line_y = vertical_padding + day_height + row_spacing * extra_line - extra_rows_monday * row_spacing
+		pdf.line(horizontal_padding + indent_padding, line_y, horizontal_padding + day_width, line_y)
 
 	# Add date labels on left
 	date = date_iter.get_next()
