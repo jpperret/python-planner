@@ -16,7 +16,8 @@ There are a few variables early in the code that can be adjusted to change the c
 ## TODO
 - If final row of mini calendar is all next month then drop row
 - Add Holidays
-- If month changes midweek add a label for the new month ie: ![](monthChange.jpeg)
+- Toggle buttons for rows
+- Shade weekend background
 
 
 ## PDF Library

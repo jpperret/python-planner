@@ -5,9 +5,9 @@ from fpdf import FPDF  # https://pyfpdf.github.io/fpdf2/
 
 
 class Iterator:
-	'''
+	"""
 	Simple iterator class. Just has_next(), get_next() and peek()
-	'''
+	"""
 
 	def __init__(self, lst):
 		self.list = lst
@@ -24,20 +24,22 @@ class Iterator:
 		return self.list[self.index - 1]
 
 
-pdf = FPDF(orientation="l")
-pdf.set_margin(0)
-
 # general constants
 YEAR = 2022
 include_mini_cal = True
 extra_rows_monday = 3  # extra rows for monday
 rows_per_day = 7
+font = 'arial'
 
 # layout constants
 indent_padding = 15  # smaller lines for each date padding
 day_horizontal_spacing = 10  # horizontal space between days
 vertical_padding = 10
 horizontal_padding = 10
+
+pdf = FPDF(orientation="l")
+pdf.set_margin(0)
+pdf.set_font(family=font)
 
 # Compute more constants
 day_height = (pdf.h - vertical_padding * 2) / 4
@@ -61,10 +63,11 @@ date_iter = Iterator(dates)
 
 # Add title page
 pdf.add_page()
-pdf.set_font('helvetica', 'B', 30)
+pdf.set_font(style='B', size=30)
 pdf.set_y(pdf.h / 2)
 pdf.cell(txt=str(YEAR) + " PLANNER", center=True, ln=2)
-pdf.set_font('helvetica', '', 15)
+
+pdf.set_font(style='', size=15)
 pdf.cell(txt="https://github.com/jpperret/python-planner", link="https://github.com/jpperret/python-planner",
 		 center=True)
 
@@ -78,8 +81,8 @@ while date_iter.has_next():
 	pdf.set_text_color(0)
 
 	# add week title
-	pdf.set_font('helvetica', 'B', 20)
-	pdf.set_xy(0, vertical_padding*1.5)
+	pdf.set_font(style='B', size=20)
+	pdf.set_xy(0, vertical_padding * 1.5)
 	pdf.cell(w=horizontal_padding + day_horizontal_spacing + day_width, align="C",
 			 txt=first_date_of_week.strftime("Week Beginning %b %d, %Y"))
 
@@ -118,41 +121,54 @@ while date_iter.has_next():
 	date = date_iter.get_next()
 	links[date] = page_link
 
-	pdf.set_font('helvetica', "", 15)
+	pdf.set_font(style='', size=15)
 	pdf.set_xy(horizontal_padding, vertical_padding + day_height + 11 - extra_rows_monday * row_spacing)
 	pdf.cell(w=indent_padding, align="C", txt=date.strftime("%a"))
 
-	pdf.set_font('helvetica', 'B', 25)
+	pdf.set_font(style='B', size=25)
 	pdf.set_xy(horizontal_padding, vertical_padding + day_height + 2 - extra_rows_monday * row_spacing)
 	pdf.cell(w=indent_padding, align="C", txt=str(date.day))
 	for i in range(2, 4):
 		date = date_iter.get_next()
 		links[date] = page_link
 
-		pdf.set_font('helvetica', "", 15)
+		pdf.set_font(style='', size=15)
 		pdf.set_xy(horizontal_padding, vertical_padding + day_height * i + 11)
 		pdf.cell(w=indent_padding, align="C", txt=date.strftime("%a"))
 
-		pdf.set_font('helvetica', 'B', 25)
+		pdf.set_font(style='B', size=25)
 		pdf.set_xy(horizontal_padding, vertical_padding + day_height * i + 2)
 		pdf.cell(w=indent_padding, align="C", txt=str(date.day))
+
+		if date.day == 1:
+			pdf.set_font(style='', size=14)
+			pdf.set_text_color(200)
+			pdf.set_xy(horizontal_padding+indent_padding+1, vertical_padding + day_height*i+1)
+			pdf.cell(txt=date.strftime("%B %Y"))
+			pdf.set_text_color(0)
 
 	# Add date labels on right
 	for i in range(4):
 		date = date_iter.get_next()
 		links[date] = page_link
 
-		pdf.set_font('helvetica', "", 15)
+		pdf.set_font(style='', size=15)
 		pdf.set_xy(horizontal_padding + day_width + day_horizontal_spacing, vertical_padding + day_height * i + 11)
 		pdf.cell(w=indent_padding, align="C", txt=date.strftime("%a"))
 
-		pdf.set_font('helvetica', 'B', 25)
+		pdf.set_font(style='B', size=25)
 		pdf.set_xy(horizontal_padding + day_width + day_horizontal_spacing, vertical_padding + day_height * i + 2)
 		pdf.cell(w=indent_padding, align="C", txt=str(date.day))
 
+		if date.day == 1:
+			pdf.set_font(style='', size=14)
+			pdf.set_text_color(200)
+			pdf.set_xy(horizontal_padding+day_width+day_horizontal_spacing+indent_padding+1, vertical_padding + day_height*i+1)
+			pdf.cell(txt=date.strftime("%B %Y"))
+			pdf.set_text_color(0)
+
 	if include_mini_cal:
 		# insert month overview in bottom right corner
-		pdf.set_font('helvetica', "", 10)
 
 		# set grey background
 		pdf.set_xy(cx, cy)
@@ -170,6 +186,7 @@ while date_iter.has_next():
 			index_start_calendar -= 1
 
 		# Add month header
+		pdf.set_font(style='', size=10)
 		pdf.set_xy(cx, cy)
 		pdf.cell(w=cw, txt=datetime.datetime(YEAR, cal_month, 1).strftime("%B"), align="C")
 
