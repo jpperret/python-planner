@@ -16,9 +16,7 @@ There are a few variables early in the code that can be adjusted to change the c
 ## TODO
 - If final row of mini calendar is all next month then drop row
 - Add Holidays
-- Toggle buttons for rows
-- Shade weekend background
-
+- Toggle buttons for rows?
 
 ## PDF Library
 

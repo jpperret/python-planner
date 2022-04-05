@@ -29,7 +29,7 @@ YEAR = 2022
 include_mini_cal = True
 extra_rows_monday = 3  # extra rows for monday
 rows_per_day = 7
-font = 'arial'
+font = 'helvetica'
 
 # layout constants
 indent_padding = 15  # smaller lines for each date padding
@@ -78,7 +78,10 @@ while date_iter.has_next():
 
 	first_date_of_week = date_iter.peek()
 
-	pdf.set_text_color(0)
+	# Add shading behind Saturday and Sunday
+	pdf.set_fill_color(240)
+	pdf.set_xy(horizontal_padding + day_horizontal_spacing + day_width, vertical_padding + day_height * 2)
+	pdf.cell(day_width, day_height*2,txt="", fill=True)
 
 	# add week title
 	pdf.set_font(style='B', size=20)
@@ -172,8 +175,8 @@ while date_iter.has_next():
 
 		# set grey background
 		pdf.set_xy(cx, cy)
-		pdf.set_fill_color(235)
-		pdf.cell(cw, ch, txt="", fill=True)
+		pdf.set_fill_color(250)
+		pdf.cell(cw, ch, txt="", fill=True, border=1)
 
 		# If month changes on thurs then use next month
 		first_date_of_month = dates[dates.index(first_date_of_week) + 3]
@@ -207,9 +210,8 @@ while date_iter.has_next():
 				pdf.set_link(link, page=page)
 				if dates[index_start_calendar].month != cal_month:
 					pdf.set_text_color(200)
-				else:
-					pdf.set_text_color(0)
 				pdf.cell(txt=str(dates[index_start_calendar].day), link=link)
+				pdf.set_text_color(0)
 
 				# Add a border around this week
 				if dates[index_start_calendar] == first_date_of_week:
