@@ -81,7 +81,7 @@ while date_iter.has_next():
 	# Add shading behind Saturday and Sunday
 	pdf.set_fill_color(240)
 	pdf.set_xy(horizontal_padding + day_horizontal_spacing + day_width, vertical_padding + day_height * 2)
-	pdf.cell(day_width, day_height*2,txt="", fill=True)
+	pdf.cell(day_width, day_height * 2, txt="", fill=True)
 
 	# add week title
 	pdf.set_font(style='B', size=20)
@@ -146,7 +146,7 @@ while date_iter.has_next():
 		if date.day == 1:
 			pdf.set_font(style='', size=14)
 			pdf.set_text_color(200)
-			pdf.set_xy(horizontal_padding+indent_padding+1, vertical_padding + day_height*i+1)
+			pdf.set_xy(horizontal_padding + indent_padding + 1, vertical_padding + day_height * i + 1)
 			pdf.cell(txt=date.strftime("%B %Y"))
 			pdf.set_text_color(0)
 
@@ -166,20 +166,21 @@ while date_iter.has_next():
 		if date.day == 1:
 			pdf.set_font(style='', size=14)
 			pdf.set_text_color(200)
-			pdf.set_xy(horizontal_padding+day_width+day_horizontal_spacing+indent_padding+1, vertical_padding + day_height*i+1)
+			pdf.set_xy(horizontal_padding + day_width + day_horizontal_spacing + indent_padding + 1,
+					   vertical_padding + day_height * i + 1)
 			pdf.cell(txt=date.strftime("%B %Y"))
 			pdf.set_text_color(0)
 
-	if include_mini_cal:
-		# insert month overview in bottom right corner
+	if include_mini_cal:  # insert month overview in bottom right corner
 
 		# set grey background
 		pdf.set_xy(cx, cy)
 		pdf.set_fill_color(250)
 		pdf.cell(cw, ch, txt="", fill=True, border=1)
 
+		# Get first date for mini calendar
 		# If month changes on thurs then use next month
-		first_date_of_month = dates[dates.index(first_date_of_week) + 3]
+		first_date_of_month = dates[dates.index(first_date_of_week) + calendar.THURSDAY]
 		# Get first day of month to start mini calendar
 		index_start_calendar = max(dates.index(first_date_of_month) - first_date_of_month.day + 1, 0)
 		# Get calendar month. If before year starts then use January
@@ -187,6 +188,10 @@ while date_iter.has_next():
 		# get monday
 		while dates[index_start_calendar].weekday() != 0:
 			index_start_calendar -= 1
+
+		weeks_in_month = 6 if (index_start_calendar + 6 * 7) < len(dates) \
+							  and dates[index_start_calendar + 5 * 7].month == cal_month else 5
+		crh = ch / (weeks_in_month + 2)
 
 		# Add month header
 		pdf.set_font(style='', size=10)
@@ -199,7 +204,7 @@ while date_iter.has_next():
 			pdf.cell(txt=["M", "T", "W", "T", "F", "S", "S"][c])
 
 		# Add dates and links to page
-		for r in range(6):  # up to 6 weeks for each month
+		for r in range(weeks_in_month):
 			for c in range(7):  # 7 days in a week
 				if index_start_calendar >= len(dates):
 					break
