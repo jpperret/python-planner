@@ -14,7 +14,6 @@ There are a few variables early in the code that can be adjusted to change the c
 |   rows_per_day    | How many lines to have in each day. The size of each day is based of the padding variables and the page size. |
 
 ## TODO
-- If final row of mini calendar is all next month then drop row
 - Add Holidays
 - Toggle buttons for rows?
 
