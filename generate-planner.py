@@ -31,6 +31,14 @@ extra_rows_monday = 3  # extra rows for monday
 rows_per_day = 7
 font = 'helvetica'
 
+# Does not support two holidays on one day
+holidays = {datetime.date(YEAR, 1, 17): "Martin Luther King, Jr. Day",
+			datetime.date(YEAR, 2, 21): "President's Day",
+			datetime.date(YEAR, 5, 30): "Memorial Day",
+			datetime.date(YEAR, 6, 20): "Juneteenth",
+			datetime.date(YEAR, 8, 1): "first of august"}
+holidays.setdefault(None)
+
 # layout constants
 indent_padding = 15  # smaller lines for each date padding
 day_horizontal_spacing = 10  # horizontal space between days
@@ -87,7 +95,7 @@ while date_iter.has_next():
 	pdf.set_font(style='B', size=20)
 	pdf.set_xy(0, vertical_padding * 1.5)
 	pdf.cell(w=horizontal_padding + day_horizontal_spacing + day_width, align="C",
-			 txt=first_date_of_week.strftime("Week Beginning %b %d, %Y"))
+			 txt=first_date_of_week.strftime("Week Beginning %B %d, %Y"))
 
 	# Add lines to separate days
 	pdf.set_line_width(.3)
@@ -131,6 +139,26 @@ while date_iter.has_next():
 	pdf.set_font(style='B', size=25)
 	pdf.set_xy(horizontal_padding, vertical_padding + day_height + 2 - extra_rows_monday * row_spacing)
 	pdf.cell(w=indent_padding, align="C", txt=str(date.day))
+
+	if date.day == 1:
+		pdf.set_font(style='', size=14)
+		pdf.set_text_color(200)
+		pdf.set_xy(horizontal_padding + indent_padding + 1,
+				   vertical_padding + day_height + 1 - extra_rows_monday * row_spacing)
+		pdf.cell(txt=date.strftime("%B %Y"))
+		pdf.set_text_color(0)
+
+	if date in holidays:
+		pdf.set_font(style='', size=14)
+		pdf.set_text_color(200)
+		pdf.set_xy(horizontal_padding + indent_padding + 1,
+				   vertical_padding + day_height + 1 - extra_rows_monday * row_spacing)
+		if date.day == 1:
+			pdf.set_xy(horizontal_padding + indent_padding + 1,
+					   vertical_padding + day_height + 1 + row_spacing - extra_rows_monday * row_spacing)
+		pdf.cell(txt=holidays[date])
+		pdf.set_text_color(0)
+
 	for i in range(2, 4):
 		date = date_iter.get_next()
 		links[date] = page_link
@@ -148,6 +176,15 @@ while date_iter.has_next():
 			pdf.set_text_color(200)
 			pdf.set_xy(horizontal_padding + indent_padding + 1, vertical_padding + day_height * i + 1)
 			pdf.cell(txt=date.strftime("%B %Y"))
+			pdf.set_text_color(0)
+
+		if date in holidays:
+			pdf.set_font(style='', size=14)
+			pdf.set_text_color(200)
+			pdf.set_xy(horizontal_padding + indent_padding + 1, vertical_padding + day_height * i + 1)
+			# if date.day == 1:
+			#	pdf.set_xy(horizontal_padding + indent_padding + 1, vertical_padding + day_height * i + 1 + row_spacing)
+			pdf.cell(txt=holidays[date])
 			pdf.set_text_color(0)
 
 	# Add date labels on right
@@ -169,6 +206,17 @@ while date_iter.has_next():
 			pdf.set_xy(horizontal_padding + day_width + day_horizontal_spacing + indent_padding + 1,
 					   vertical_padding + day_height * i + 1)
 			pdf.cell(txt=date.strftime("%B %Y"))
+			pdf.set_text_color(0)
+
+		if date in holidays:
+			pdf.set_font(style='', size=14)
+			pdf.set_text_color(200)
+			pdf.set_xy(horizontal_padding + day_width + day_horizontal_spacing + indent_padding + 1,
+					   vertical_padding + day_height * i + 1)
+			if date.day == 1:
+				pdf.set_xy(horizontal_padding + day_width + day_horizontal_spacing + indent_padding + 1,
+						   vertical_padding + day_height * i + 1 + row_spacing)
+			pdf.cell(txt=holidays[date])
 			pdf.set_text_color(0)
 
 	if include_mini_cal:  # insert month overview in bottom right corner
