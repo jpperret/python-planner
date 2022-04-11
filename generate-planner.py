@@ -1,7 +1,13 @@
+import requests as req
+from bs4 import BeautifulSoup
+import pandas as pd
+from datetime import datetime
+from datetime import date as new_date
 import calendar
-import datetime
+
 
 from fpdf import FPDF  # https://pyfpdf.github.io/fpdf2/
+
 
 
 class Iterator:
@@ -25,19 +31,27 @@ class Iterator:
 
 
 # general constants
-YEAR = 2022
+YEAR = 2023
 include_mini_cal = True
 extra_rows_monday = 3  # extra rows for monday
 rows_per_day = 7
 font = 'helvetica'
+import_fed_holidays = True
 
-# Does not support two holidays on one day
-holidays = {datetime.date(YEAR, 1, 17): "Martin Luther King, Jr. Day",
-			datetime.date(YEAR, 2, 21): "President's Day",
-			datetime.date(YEAR, 5, 30): "Memorial Day",
-			datetime.date(YEAR, 6, 20): "Juneteenth",
-			datetime.date(YEAR, 8, 1): "first of august"}
+# NOTE: does not support two holidays on one day
+holidays = {}
 holidays.setdefault(None)
+
+if import_fed_holidays:
+	# This is probably more complicated than it's worth, but I got bored
+	# Collects table with holidays from site then converts to pandas dataframe
+	df = pd.read_html(
+		str(BeautifulSoup(req.get("https://www.calendarpedia.com/holidays/federal-holidays-"+str(YEAR)+".html").content,
+						  'html.parser').find_all('table')), header=1)[-5].drop("Day of the week", axis=1)
+
+	for index, row in df.iterrows():
+		holidays[datetime.strptime(row['Date'], "%B %d, %Y").date()] = row['Federal holiday']
+
 
 # layout constants
 indent_padding = 15  # smaller lines for each date padding
@@ -244,7 +258,7 @@ while date_iter.has_next():
 		# Add month header
 		pdf.set_font(style='', size=10)
 		pdf.set_xy(cx, cy)
-		pdf.cell(w=cw, txt=datetime.datetime(YEAR, cal_month, 1).strftime("%B"), align="C")
+		pdf.cell(w=cw, txt=new_date(YEAR, cal_month, 1).strftime("%B"), align="C")
 
 		# Add weekday headers
 		for c in range(7):
