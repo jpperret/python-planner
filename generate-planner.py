@@ -31,10 +31,10 @@ class Iterator:
 
 
 # general constants
-YEAR = 2023
+YEAR = 2022
 include_mini_cal = True
 extra_rows_monday = 3  # extra rows for monday
-rows_per_day = 7
+rows_per_day = 6
 font = 'helvetica'
 import_fed_holidays = True
 
@@ -234,10 +234,10 @@ while date_iter.has_next():
 			pdf.set_text_color(0)
 
 	if include_mini_cal:  # insert month overview in bottom right corner
-
 		# set grey background
 		pdf.set_xy(cx, cy)
 		pdf.set_fill_color(250)
+		# I would like a thicker border, but it's not supported
 		pdf.cell(cw, ch, txt="", fill=True, border=1)
 
 		# Get first date for mini calendar
@@ -251,8 +251,11 @@ while date_iter.has_next():
 		while dates[index_start_calendar].weekday() != 0:
 			index_start_calendar -= 1
 
-		weeks_in_month = 6 if (index_start_calendar + 6 * 7) < len(dates) \
-							  and dates[index_start_calendar + 5 * 7].month == cal_month else 5
+		if (index_start_calendar + 6 * 7) < len(dates) and dates[index_start_calendar + 5 * 7].month == cal_month:
+			weeks_in_month = 6
+		else:
+			weeks_in_month = 5
+
 		crh = ch / (weeks_in_month + 2)
 
 		# Add month header
@@ -268,23 +271,25 @@ while date_iter.has_next():
 		# Add dates and links to page
 		for r in range(weeks_in_month):
 			for c in range(7):  # 7 days in a week
+				# Check if index is valid
 				if index_start_calendar >= len(dates):
 					break
-				pdf.set_xy(cx + ccw * c, cy + crh * (r + 2))  # + 2 to skip month and weekday headers
+
 				link = pdf.add_link()
-				# divided by 7 for week. Add 2 for rounding down and title page
-				page = int((index_start_calendar / 7) + 2)
+				page = int(index_start_calendar / 7) + 2  # divided by 7 for week. Add 2 for rounding down and title page
 				pdf.set_link(link, page=page)
 				if dates[index_start_calendar].month != cal_month:
 					pdf.set_text_color(200)
-				pdf.cell(txt=str(dates[index_start_calendar].day), link=link)
+
+				pdf.set_xy(cx + ccw * c, cy + crh * (r + 2))  # + 2 to skip month and weekday headers
+				pdf.cell(txt=str(dates[index_start_calendar].day), link=link, align='C')
 				pdf.set_text_color(0)
 
-				# Add a border around this week
+				# Add a border around current week
 				if dates[index_start_calendar] == first_date_of_week:
 					# (ccw / 10) is one half the padding in the rectangle (width = cw - ccw / 5)
-					# (r + 2) to skip month and weekday headers
-					pdf.set_xy(cx + ccw * c + (ccw / 10), cy + crh * (r + 2))
+					# (r + 2) to skip month and weekday headers -.1 to center
+					pdf.set_xy(cx + ccw * c + (ccw / 10), cy + crh * (r + 2 - .1))
 					pdf.cell(w=cw - ccw / 5, h=crh, border=True)
 
 				index_start_calendar += 1

@@ -1,7 +1,8 @@
 # Python Planner
 
-After searching for a PDF weekly planner for my iPad I decided to try and create one with python. 
-Feel free to download the PDF in this repo.
+After searching for a PDF weekly planner for my iPad I decided to try and create one with python.
+
+I made a repo instead of just posting the PDF so if desired users can modify the code and create a modified planner that suits their needs better
 
 ## Options/Settings
 There are a few variables early in the code that can be adjusted to change the calendar
@@ -13,9 +14,11 @@ There are a few variables early in the code that can be adjusted to change the c
 | extra_rows_monday | How many extra rows to include for the first day of the week (Monday)                                         |
 |   rows_per_day    | How many lines to have in each day. The size of each day is based of the padding variables and the page size. |
 
-## TODO
 
 ## PDF Library
+### Implemented
+I ended up choosing FPDF because it seemed to have the best documentation. 
+I was able to perform all desired operations fairly simply with it, so I am happy with the choice.
 
 ### Considered
 - [pyPdf](http://pybrary.net/pyPdf/pythondoc-pyPdf.pdf.html) - Doesn't seem to have recent documentation 
@@ -26,6 +29,3 @@ There are a few variables early in the code that can be adjusted to change the c
 - pdfrw - seems to be more based around editing rather than creating
 - [PDFMiner](https://pypi.org/project/pdfminer/) - "PDFMiner is a text extraction tool for PDF documents." 
 
-### Decision
-I ended up choosing FPDF because it seemed to have the best documentation. 
-Was able to perform all desired operations fairly simply with it.
