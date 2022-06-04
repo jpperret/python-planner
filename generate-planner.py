@@ -5,9 +5,7 @@ from datetime import datetime
 from datetime import date as new_date
 import calendar
 
-
 from fpdf import FPDF  # https://pyfpdf.github.io/fpdf2/
-
 
 
 class Iterator:
@@ -45,9 +43,10 @@ holidays.setdefault(None)
 if import_fed_holidays:
 	# This is probably more complicated than it's worth, but I got bored
 	# Collects table with holidays from site then converts to pandas dataframe
-	df = pd.read_html(
-		str(BeautifulSoup(req.get("https://www.calendarpedia.com/holidays/federal-holidays-"+str(YEAR)+".html").content,
-						  'html.parser').find_all('table')), header=1)[-5].drop("Day of the week", axis=1)
+	federal_holidays_site = "https://www.calendarpedia.com/holidays/federal-holidays-" + str(YEAR) + ".html"
+	df = pd.read_html(str(BeautifulSoup(req.get(federal_holidays_site).content, 'html.parser').find_all('table')),
+					  header=1)[-5] \
+		.drop("Day of the week", axis=1)
 
 	for index, row in df.iterrows():
 		holidays[datetime.strptime(row['Date'], "%B %d, %Y").date()] = row['Federal holiday']
@@ -160,22 +159,21 @@ while date_iter.has_next():
 	pdf.set_xy(horizontal_padding, vertical_padding + day_height + 2 - extra_rows_monday * row_spacing)
 	pdf.cell(w=indent_padding, align="C", txt=str(date.day))
 
+	something_x = horizontal_padding + indent_padding + 1 # TODO rename
+	something_y = vertical_padding + day_height + 1 - extra_rows_monday * row_spacing
 	if date.day == 1:
 		pdf.set_font(style='', size=14)
 		pdf.set_text_color(200)
-		pdf.set_xy(horizontal_padding + indent_padding + 1,
-				   vertical_padding + day_height + 1 - extra_rows_monday * row_spacing)
+		pdf.set_xy(something_x, something_y)
 		pdf.cell(txt=date.strftime("%B %Y"))
 		pdf.set_text_color(0)
 
 	if date in holidays:
 		pdf.set_font(style='', size=14)
 		pdf.set_text_color(200)
-		pdf.set_xy(horizontal_padding + indent_padding + 1,
-				   vertical_padding + day_height + 1 - extra_rows_monday * row_spacing)
+		pdf.set_xy(something_x, something_y)
 		if date.day == 1:
-			pdf.set_xy(horizontal_padding + indent_padding + 1,
-					   vertical_padding + day_height + 1 + row_spacing - extra_rows_monday * row_spacing)
+			pdf.set_xy(something_x, something_y + row_spacing)
 		pdf.cell(txt=holidays[date])
 		pdf.set_text_color(0)
 
@@ -191,19 +189,19 @@ while date_iter.has_next():
 		pdf.set_xy(horizontal_padding, vertical_padding + day_height * i + 2)
 		pdf.cell(w=indent_padding, align="C", txt=str(date.day))
 
+		something_x = horizontal_padding + indent_padding + 1
+		something_y = vertical_padding + day_height * i + 1
 		if date.day == 1:
 			pdf.set_font(style='', size=14)
 			pdf.set_text_color(200)
-			pdf.set_xy(horizontal_padding + indent_padding + 1, vertical_padding + day_height * i + 1)
+			pdf.set_xy(something_x, something_y)
 			pdf.cell(txt=date.strftime("%B %Y"))
 			pdf.set_text_color(0)
 
 		if date in holidays:
 			pdf.set_font(style='', size=14)
 			pdf.set_text_color(200)
-			pdf.set_xy(horizontal_padding + indent_padding + 1, vertical_padding + day_height * i + 1)
-			# if date.day == 1:
-			#	pdf.set_xy(horizontal_padding + indent_padding + 1, vertical_padding + day_height * i + 1 + row_spacing)
+			pdf.set_xy(something_x, something_y)
 			pdf.cell(txt=holidays[date])
 			pdf.set_text_color(0)
 
@@ -220,22 +218,23 @@ while date_iter.has_next():
 		pdf.set_xy(horizontal_padding + day_width + day_horizontal_spacing, vertical_padding + day_height * i + 2)
 		pdf.cell(w=indent_padding, align="C", txt=str(date.day))
 
+		something_x = horizontal_padding + day_width + day_horizontal_spacing + indent_padding + 1
+		something_y = vertical_padding + day_height * i + 1
+
 		if date.day == 1:
 			pdf.set_font(style='', size=14)
 			pdf.set_text_color(200)
-			pdf.set_xy(horizontal_padding + day_width + day_horizontal_spacing + indent_padding + 1,
-					   vertical_padding + day_height * i + 1)
+			pdf.set_xy(something_x, something_y)
 			pdf.cell(txt=date.strftime("%B %Y"))
 			pdf.set_text_color(0)
 
 		if date in holidays:
 			pdf.set_font(style='', size=14)
 			pdf.set_text_color(200)
-			pdf.set_xy(horizontal_padding + day_width + day_horizontal_spacing + indent_padding + 1,
-					   vertical_padding + day_height * i + 1)
+			pdf.set_xy(something_x, something_y)
+
 			if date.day == 1:
-				pdf.set_xy(horizontal_padding + day_width + day_horizontal_spacing + indent_padding + 1,
-						   vertical_padding + day_height * i + 1 + row_spacing)
+				pdf.set_xy(something_x, something_y+ row_spacing)
 			pdf.cell(txt=holidays[date])
 			pdf.set_text_color(0)
 
@@ -282,7 +281,8 @@ while date_iter.has_next():
 					break
 
 				link = pdf.add_link()
-				page = int(index_start_calendar / 7) + 2  # divided by 7 for week. Add 2 for rounding down and title page
+				# page number divided by 7 for week. Add 2 for rounding down and title page
+				page = int(index_start_calendar / 7) + 2
 				pdf.set_link(link, page=page)
 				if dates[index_start_calendar].month != cal_month:
 					pdf.set_text_color(200)
