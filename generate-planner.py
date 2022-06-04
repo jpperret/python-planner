@@ -52,6 +52,12 @@ if import_fed_holidays:
 	for index, row in df.iterrows():
 		holidays[datetime.strptime(row['Date'], "%B %d, %Y").date()] = row['Federal holiday']
 
+# Add UMD specific Holidays
+holidays[datetime(2022, 8, 29).date()] = "First day of Class"
+holidays[datetime(2022, 9, 5).date()] = "Labor Day - No class"
+holidays[datetime(2022, 11, 23).date()] = "First day of Thanksgiving Break"
+holidays[datetime(2022, 12, 13).date()] = "Reading Day"
+holidays[datetime(2022, 12, 20).date()] = "Last day of Finals"
 
 # layout constants
 indent_padding = 15  # smaller lines for each date padding
