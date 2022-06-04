@@ -43,13 +43,11 @@ holidays.setdefault(None)
 if import_fed_holidays:
 	# This is probably more complicated than it's worth, but I got bored
 	# Collects table with holidays from site then converts to pandas dataframe
-	federal_holidays_site = "https://www.calendarpedia.com/holidays/federal-holidays-" + str(YEAR) + ".html"
-	df = pd.read_html(str(BeautifulSoup(req.get(federal_holidays_site).content, 'html.parser').find_all('table')),
-					  header=1)[-5] \
-		.drop("Day of the week", axis=1)
+	df = pd.read_html(str(BeautifulSoup(req.get("https://www.officeholidays.com/countries/usa/" + str(YEAR)).content,
+						  'html.parser').find_all('table')))[0]
 
-	for index, row in df.iterrows():
-		holidays[datetime.strptime(row['Date'], "%B %d, %Y").date()] = row['Federal holiday']
+	for _, row in df.iterrows():
+		holidays[datetime.strptime(row['Date'] + " " + str(YEAR), "%b %d %Y").date()] = row['Holiday Name'].replace("in lieu", "observed")
 
 # Add UMD specific Holidays
 holidays[datetime(2022, 8, 29).date()] = "First day of Class"
