@@ -28,6 +28,28 @@ class Iterator:
 		return self.list[self.index - 1]
 
 
+def add_holiday(date, day_x, day_y):
+	"""
+	adds a holiday to the first row or the month if it's the first day of the month
+	"""
+
+	if date.day == 1:
+		pdf.set_font(style='', size=14)
+		pdf.set_text_color(200)
+		pdf.set_xy(day_x, day_y)
+		pdf.cell(txt=date.strftime("%B %Y"))
+		pdf.set_text_color(0)
+
+	if date in holidays:
+		pdf.set_font(style='', size=14)
+		pdf.set_text_color(200)
+		pdf.set_xy(day_x, day_y)
+		if date.day == 1:
+			pdf.set_xy(day_x, day_y + row_spacing)
+		pdf.cell(txt=holidays[date])
+		pdf.set_text_color(0)
+
+
 # general constants
 YEAR = 2022
 include_mini_cal = True
@@ -38,16 +60,16 @@ import_fed_holidays = True
 
 # NOTE: does not support two holidays on one day
 holidays = {}
-holidays.setdefault(None)
 
 if import_fed_holidays:
 	# This is probably more complicated than it's worth, but I got bored
 	# Collects table with holidays from site then converts to pandas dataframe
 	df = pd.read_html(str(BeautifulSoup(req.get("https://www.officeholidays.com/countries/usa/" + str(YEAR)).content,
-						  'html.parser').find_all('table')))[0]
+										'html.parser').find_all('table')))[0]
 
 	for _, row in df.iterrows():
-		holidays[datetime.strptime(row['Date'] + " " + str(YEAR), "%b %d %Y").date()] = row['Holiday Name'].replace("in lieu", "observed")
+		holidays[datetime.strptime(row['Date'] + " " + str(YEAR), "%b %d %Y").date()] \
+			= row['Holiday Name'].replace("in lieu", "observed")
 
 # Add UMD specific Holidays
 holidays[datetime(2022, 8, 29).date()] = "First day of Class"
@@ -93,7 +115,8 @@ pdf.set_y(pdf.h / 2)
 pdf.cell(txt=str(YEAR) + " PLANNER", center=True, ln=2)
 
 pdf.set_font(style='', size=15)
-pdf.cell(txt="https://github.com/jpperret/python-planner", link="https://github.com/jpperret/python-planner",
+pdf.cell(txt="https://github.com/jpperret/python-planner",
+		 link="https://github.com/jpperret/python-planner",
 		 center=True)
 
 while date_iter.has_next():
@@ -138,8 +161,9 @@ while date_iter.has_next():
 
 			# add line on right side
 			line_y = vertical_padding + day_height * y + row_spacing * line
-			pdf.line(horizontal_padding + indent_padding + day_width + day_horizontal_spacing, line_y,
-					 horizontal_padding + day_width + day_width + day_horizontal_spacing, line_y)
+			day_x = horizontal_padding + day_width + day_horizontal_spacing
+			pdf.line(day_x + indent_padding, line_y, day_x + day_width, line_y)
+
 	# Add extra rows for monday
 	for extra_line in range(extra_rows_monday + 1):
 		line_y = vertical_padding + day_height + row_spacing * extra_line - extra_rows_monday * row_spacing
@@ -157,24 +181,10 @@ while date_iter.has_next():
 	pdf.set_xy(horizontal_padding, vertical_padding + day_height + 2 - extra_rows_monday * row_spacing)
 	pdf.cell(w=indent_padding, align="C", txt=str(date.day))
 
-	something_x = horizontal_padding + indent_padding + 1 # TODO rename
-	something_y = vertical_padding + day_height + 1 - extra_rows_monday * row_spacing
-	if date.day == 1:
-		pdf.set_font(style='', size=14)
-		pdf.set_text_color(200)
-		pdf.set_xy(something_x, something_y)
-		pdf.cell(txt=date.strftime("%B %Y"))
-		pdf.set_text_color(0)
+	add_holiday(date, horizontal_padding + indent_padding + 1,
+				vertical_padding + day_height + 1 - extra_rows_monday * row_spacing)
 
-	if date in holidays:
-		pdf.set_font(style='', size=14)
-		pdf.set_text_color(200)
-		pdf.set_xy(something_x, something_y)
-		if date.day == 1:
-			pdf.set_xy(something_x, something_y + row_spacing)
-		pdf.cell(txt=holidays[date])
-		pdf.set_text_color(0)
-
+	# Have to do all of left side before right side
 	for i in range(2, 4):
 		date = date_iter.get_next()
 		links[date] = page_link
@@ -187,21 +197,7 @@ while date_iter.has_next():
 		pdf.set_xy(horizontal_padding, vertical_padding + day_height * i + 2)
 		pdf.cell(w=indent_padding, align="C", txt=str(date.day))
 
-		something_x = horizontal_padding + indent_padding + 1
-		something_y = vertical_padding + day_height * i + 1
-		if date.day == 1:
-			pdf.set_font(style='', size=14)
-			pdf.set_text_color(200)
-			pdf.set_xy(something_x, something_y)
-			pdf.cell(txt=date.strftime("%B %Y"))
-			pdf.set_text_color(0)
-
-		if date in holidays:
-			pdf.set_font(style='', size=14)
-			pdf.set_text_color(200)
-			pdf.set_xy(something_x, something_y)
-			pdf.cell(txt=holidays[date])
-			pdf.set_text_color(0)
+		add_holiday(date, horizontal_padding + indent_padding + 1, vertical_padding + day_height * i + 1)
 
 	# Add date labels on right
 	for i in range(4):
@@ -216,25 +212,9 @@ while date_iter.has_next():
 		pdf.set_xy(horizontal_padding + day_width + day_horizontal_spacing, vertical_padding + day_height * i + 2)
 		pdf.cell(w=indent_padding, align="C", txt=str(date.day))
 
-		something_x = horizontal_padding + day_width + day_horizontal_spacing + indent_padding + 1
-		something_y = vertical_padding + day_height * i + 1
-
-		if date.day == 1:
-			pdf.set_font(style='', size=14)
-			pdf.set_text_color(200)
-			pdf.set_xy(something_x, something_y)
-			pdf.cell(txt=date.strftime("%B %Y"))
-			pdf.set_text_color(0)
-
-		if date in holidays:
-			pdf.set_font(style='', size=14)
-			pdf.set_text_color(200)
-			pdf.set_xy(something_x, something_y)
-
-			if date.day == 1:
-				pdf.set_xy(something_x, something_y+ row_spacing)
-			pdf.cell(txt=holidays[date])
-			pdf.set_text_color(0)
+		day_x = horizontal_padding + day_width + day_horizontal_spacing + indent_padding + 1
+		day_y = vertical_padding + day_height * i + 1
+		add_holiday(date, day_x, day_y)
 
 	if include_mini_cal:  # insert month overview in bottom right corner
 		# set grey background
