@@ -113,7 +113,6 @@ pdf.add_page()
 pdf.set_font(style='B', size=30)
 pdf.set_y(pdf.h / 2)
 pdf.cell(txt=str(YEAR) + " PLANNER", center=True, ln=2)
-
 pdf.set_font(style='', size=15)
 pdf.cell(txt="https://github.com/jpperret/python-planner",
 		 link="https://github.com/jpperret/python-planner",
@@ -169,35 +168,23 @@ while date_iter.has_next():
 		line_y = vertical_padding + day_height + row_spacing * extra_line - extra_rows_monday * row_spacing
 		pdf.line(horizontal_padding + indent_padding, line_y, horizontal_padding + day_width, line_y)
 
-	# Add date labels on left
-	date = date_iter.get_next()
-	links[date] = page_link
-
-	pdf.set_font(style='', size=15)
-	pdf.set_xy(horizontal_padding, vertical_padding + day_height + 11 - extra_rows_monday * row_spacing)
-	pdf.cell(w=indent_padding, align="C", txt=date.strftime("%a"))
-
-	pdf.set_font(style='B', size=25)
-	pdf.set_xy(horizontal_padding, vertical_padding + day_height + 2 - extra_rows_monday * row_spacing)
-	pdf.cell(w=indent_padding, align="C", txt=str(date.day))
-
-	add_holiday(date, horizontal_padding + indent_padding + 1,
-				vertical_padding + day_height + 1 - extra_rows_monday * row_spacing)
-
 	# Have to do all of left side before right side
-	for i in range(2, 4):
+	for i in range(1, 4):
 		date = date_iter.get_next()
 		links[date] = page_link
 
 		pdf.set_font(style='', size=15)
-		pdf.set_xy(horizontal_padding, vertical_padding + day_height * i + 11)
+		pdf.set_xy(horizontal_padding,
+				   vertical_padding + day_height * i + 11 - extra_rows_monday * row_spacing * (i == 1))
 		pdf.cell(w=indent_padding, align="C", txt=date.strftime("%a"))
 
 		pdf.set_font(style='B', size=25)
-		pdf.set_xy(horizontal_padding, vertical_padding + day_height * i + 2)
+		pdf.set_xy(horizontal_padding,
+				   vertical_padding + day_height * i + 2 - extra_rows_monday * row_spacing * (i == 1))
 		pdf.cell(w=indent_padding, align="C", txt=str(date.day))
 
-		add_holiday(date, horizontal_padding + indent_padding + 1, vertical_padding + day_height * i + 1)
+		add_holiday(date, horizontal_padding + indent_padding + 1,
+					vertical_padding + day_height + 1 - extra_rows_monday * row_spacing * (i == 1))
 
 	# Add date labels on right
 	for i in range(4):
@@ -212,9 +199,8 @@ while date_iter.has_next():
 		pdf.set_xy(horizontal_padding + day_width + day_horizontal_spacing, vertical_padding + day_height * i + 2)
 		pdf.cell(w=indent_padding, align="C", txt=str(date.day))
 
-		day_x = horizontal_padding + day_width + day_horizontal_spacing + indent_padding + 1
-		day_y = vertical_padding + day_height * i + 1
-		add_holiday(date, day_x, day_y)
+		add_holiday(date, horizontal_padding + day_width + day_horizontal_spacing + indent_padding + 1,
+					vertical_padding + day_height * i + 1)
 
 	if include_mini_cal:  # insert month overview in bottom right corner
 		# set grey background
