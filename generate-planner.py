@@ -60,9 +60,9 @@ holidays[datetime(2022, 12, 20).date()] = "Last day of Finals"
 
 # layout constants
 indent_padding = 15  # smaller lines for each date padding
-day_horizontal_spacing = 10  # horizontal space between days
-vertical_padding = 10
-horizontal_padding = 10
+day_horizontal_spacing = 8  # horizontal space between days
+vertical_padding = day_horizontal_spacing
+horizontal_padding = vertical_padding
 
 pdf = FPDF(orientation="l")
 pdf.set_margin(0)
@@ -300,4 +300,4 @@ while date_iter.has_next():
 
 				index_start_calendar += 1
 
-pdf.output(str(YEAR) + "planner.pdf")
+pdf.output(str(YEAR) + " Planner.pdf")
