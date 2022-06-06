@@ -173,28 +173,32 @@ while date_iter.has_next():
 		date = date_iter.get_next()
 		links[date] = page_link
 
+		# Add day of week label
 		pdf.set_font(style='', size=15)
 		pdf.set_xy(horizontal_padding,
 				   vertical_padding + day_height * i + 11 - extra_rows_monday * row_spacing * (i == 1))
 		pdf.cell(w=indent_padding, align="C", txt=date.strftime("%a"))
 
+		# Add day of month label
 		pdf.set_font(style='B', size=25)
 		pdf.set_xy(horizontal_padding,
 				   vertical_padding + day_height * i + 2 - extra_rows_monday * row_spacing * (i == 1))
 		pdf.cell(w=indent_padding, align="C", txt=str(date.day))
 
 		add_holiday(date, horizontal_padding + indent_padding + 1,
-					vertical_padding + day_height + 1 - extra_rows_monday * row_spacing * (i == 1))
+					vertical_padding + day_height * i + 1 - extra_rows_monday * row_spacing * (i == 1))
 
 	# Add date labels on right
 	for i in range(4):
 		date = date_iter.get_next()
 		links[date] = page_link
 
+		# Add day of week label
 		pdf.set_font(style='', size=15)
 		pdf.set_xy(horizontal_padding + day_width + day_horizontal_spacing, vertical_padding + day_height * i + 11)
 		pdf.cell(w=indent_padding, align="C", txt=date.strftime("%a"))
 
+		# Add day of month label
 		pdf.set_font(style='B', size=25)
 		pdf.set_xy(horizontal_padding + day_width + day_horizontal_spacing, vertical_padding + day_height * i + 2)
 		pdf.cell(w=indent_padding, align="C", txt=str(date.day))
