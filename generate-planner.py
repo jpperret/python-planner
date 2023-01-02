@@ -51,7 +51,7 @@ def add_holiday(date, day_x, day_y):
 
 
 # general constants
-YEAR = 2022
+YEAR = 2023
 include_mini_cal = True
 extra_rows_monday = 3  # extra rows for monday
 rows_per_day = 6
@@ -70,13 +70,6 @@ if import_fed_holidays:
 	for _, row in df.iterrows():
 		holidays[datetime.strptime(row['Date'] + " " + str(YEAR), "%b %d %Y").date()] \
 			= row['Holiday Name'].replace("in lieu", "observed")
-
-# Add UMD specific Holidays
-holidays[datetime(2022, 8, 29).date()] = "First day of Class"
-holidays[datetime(2022, 9, 5).date()] = "Labor Day - No class"
-holidays[datetime(2022, 11, 23).date()] = "First day of Thanksgiving Break"
-holidays[datetime(2022, 12, 13).date()] = "Reading Day"
-holidays[datetime(2022, 12, 20).date()] = "Last day of Finals"
 
 # layout constants
 indent_padding = 15  # smaller lines for each date padding
