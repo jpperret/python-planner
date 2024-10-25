@@ -51,7 +51,7 @@ def add_holiday(date, day_x, day_y):
 
 
 # general constants
-YEAR = 2023
+YEAR = 2025
 include_mini_cal = True
 extra_rows_monday = 3  # extra rows for monday
 rows_per_day = 6
