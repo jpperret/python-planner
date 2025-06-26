@@ -85,7 +85,7 @@ pdf.set_font(family=font)
 day_height = (pdf.h - vertical_padding * 2) / 4
 day_width = (pdf.w - horizontal_padding * 2 - day_horizontal_spacing) / 2
 row_spacing = day_height / (rows_per_day + 1)
-links = dict()  # date to page links
+links = {}  # date to page links
 cw = row_spacing * 6.5  # mini calendar width
 ch = row_spacing * 5  # mini calendar height
 crh, ccw = ch / 8, cw / 7  # mini calendar row height and column width
@@ -136,7 +136,7 @@ while date_iter.has_next():
 		if y == 1:  # monday
 			line_y = vertical_padding + day_height * y - extra_rows_monday * row_spacing
 			pdf.line(horizontal_padding, line_y, horizontal_padding + day_width, line_y)
-		elif not y == 0:  # skip first day on left side
+		elif y != 0:  # skip first day on left side
 			line_y = vertical_padding + day_height * y
 			pdf.line(horizontal_padding, line_y, horizontal_padding + day_width, line_y)
 		line_y = vertical_padding + day_height * y
@@ -147,7 +147,7 @@ while date_iter.has_next():
 	pdf.set_line_width(.1)
 	for y in range(4):
 		for line in range(1, rows_per_day + 1):
-			if not y == 0:  # skip first day on left side
+			if y != 0:  # skip first day on left side
 				line_y = vertical_padding + day_height * y + row_spacing * line
 				pdf.line(horizontal_padding + indent_padding, line_y, horizontal_padding + day_width, line_y)
 
